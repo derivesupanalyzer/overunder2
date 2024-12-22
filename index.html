@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tick Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .market-trade-type, .controls {
+            margin-bottom: 20px;
+        }
+
+        select, input[type="number"] {
+            padding: 10px;
+            margin: 10px;
+            width: 150px;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            width: 60px;
+            height: 60px;
+            margin: 10px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .red { background-color: red; }
+        .blue { background-color: blue; }
+        .yellow { background-color: yellow; }
+        .green { background-color: green; }
+
+        .purchase {
+            display: none;
+            background-color: green;
+            color: white;
+            font-size: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px;
+        }
+
+        .candle-ball-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .candle-ball {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 10px;
+            position: relative;
+            background-color: #ccc;
+        }
+
+        .ball-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+        }
+
+        #reset {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Tick Analyzer</h1>
+
+    <!-- Market and Trade Type selection -->
+    <div class="market-trade-type">
+        <label for="market">Market:</label>
+        <select id="market">
+            <option value="volatility10">Volatility Index 10</option>
+            <option value="volatility25">Volatility 25</option>
+            <option value="volatility50">Volatility 50</option>
+            <option value="volatility75">Volatility 75</option>
+            <option value="volatility100">Volatility 100</option>
+        </select>
+
+        <label for="tradeType">Trade Type:</label>
+        <select id="tradeType">
+            <option value="riseFall">Rise / Fall</option>
+            <option value="overUnder">Over / Under</option>
+            <option value="higherLower">Higher / Lower</option>
+            <option value="touchNoTouch">Touch / No Touch</option>
+        </select>
+    </div>
+
+    <!-- Stake and Last Digit Prediction -->
+    <div class="controls">
+        <label for="stake">Stake:</label>
+        <input type="number" id="stake" min="1" placeholder="Enter Stake">
+
+        <label for="lastDigitPrediction">Last Digit Prediction:</label>
+        <select id="lastDigitPrediction">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+        </select>
+    </div>
+
+    <!-- Buttons (6, 7, 8, 9) -->
+    <div class="buttons-container">
+        <button class="button red" onclick="buttonClicked(6)">6</button>
+        <button class="button blue" onclick="buttonClicked(7)">7</button>
+        <button class="button yellow" onclick="buttonClicked(8)">8</button>
+        <button class="button green" onclick="buttonClicked(9)">9</button>
+    </div>
+
+    <!-- Purchase result -->
+    <div class="purchase" id="purchaseResult">
+        Purchase
+    </div>
+
+    <!-- Candle Balls -->
+    <div class="candle-ball-container">
+        <div class="candle-ball" id="ball1"><div class="ball-percentage" id="percentage1">0%</div></div>
+        <div class="candle-ball" id="ball2"><div class="ball-percentage" id="percentage2">0%</div></div>
+        <div class="candle-ball" id="ball3"><div class="ball-percentage" id="percentage3">0%</div></div>
+        <div class="candle-ball" id="ball4"><div class="ball-percentage" id="percentage4">0%</div></div>
+        <div class="candle-ball" id="ball5"><div class="ball-percentage" id="percentage5">0%</div></div>
+        <div class="candle-ball" id="ball6"><div class="ball-percentage" id="percentage6">0%</div></div>
+    </div>
+
+    <!-- Reset Button -->
+    <button id="reset" onclick="resetApp()">Reset</button>
+</div>
+
+<script>
+    let clickedButtons = [];
+
+    // Function to handle button clicks
+    function buttonClicked(number) {
+        clickedButtons.push(number);
+        if (clickedButtons.length > 3) {
+            clickedButtons.shift(); // Keep only the last 3 clicks
+        }
+
+        // Check if 3 continuous buttons have been clicked
+        if (clickedButtons.length === 3) {
+            document.getElementById("purchaseResult").style.display = "block";
+        }
+    }
+
+    // Function to update candle balls with random percentages
+    function updateCandleBalls() {
+        for (let i = 1; i <= 6; i++) {
+            const percentage = Math.floor(Math.random() * 100);
+            document.getElementById(`percentage${i}`).textContent = `${percentage}%`;
+
+            // Randomly change color to red or green
+            const ball = document.getElementById(`ball${i}`);
+            ball.style.backgroundColor = Math.random() > 0.5 ? "green" : "red";
+        }
+    }
+
+    // Call updateCandleBalls every 1 second
+    setInterval(updateCandleBalls, 1000);
+
+    // Function to reset the app
+    function resetApp() {
+        clickedButtons = [];
+        document.getElementById("purchaseResult").style.display = "none";
+    }
+</script>
+
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
